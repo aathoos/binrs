@@ -418,6 +418,8 @@ enum Command {
     Frombin {
         #[arg(value_name = "FILE")]
         file: PathBuf,
+        #[arg(short = 'o', long, value_name = "FILE")]
+        output: Option<PathBuf>,
     },
     Completions {
         #[arg(value_enum)]
@@ -1050,10 +1052,15 @@ fn run() -> Result<(), String> {
             Ok(())
         },
 
-        Command::Frombin { file } => {
+        Command::Frombin { file, output } => {
             let bytes = std::fs::read(&file)
                 .map_err(|e| format!("failed to read '{}': {}", file.display(), e))?;
-            print!("{}", codec::decode::decode_text(&bytes));
+            let text = codec::decode::decode_text(&bytes);
+            match output {
+                Some(dest) => std::fs::write(&dest, text.as_bytes())
+                    .map_err(|e| format!("failed to write '{}': {}", dest.display(), e))?,
+                None => print!("{}", text),
+            }
             Ok(())
         },
 
