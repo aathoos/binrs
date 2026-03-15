@@ -45,16 +45,16 @@ pub fn format_byte(byte: u8, fmt: Format) -> String {
 pub fn parse_token(s: &str, fmt: Format) -> Result<u8, String> {
     let val = match fmt {
         Format::Bin => u8::from_str_radix(s.trim_start_matches("0b"), 2),
-        Format::Hex => u8::from_str_radix(
-            s.trim_start_matches("0x").trim_start_matches("0X"),
-            16,
-        ),
+        Format::Hex => u8::from_str_radix(s.trim_start_matches("0x").trim_start_matches("0X"), 16),
         Format::Oct => u8::from_str_radix(s.trim_start_matches("0o"), 8),
-        Format::Dec => u8::from_str_radix(s, 10),
+        Format::Dec => s.parse::<u8>(),
     };
     val.map_err(|_| format!("invalid {} token '{}': expected value 0-255", fmt, s))
 }
 
 pub fn parse_bytes(input: &str, fmt: Format) -> Result<Vec<u8>, String> {
-    input.split_whitespace().map(|t| parse_token(t, fmt)).collect()
+    input
+        .split_whitespace()
+        .map(|t| parse_token(t, fmt))
+        .collect()
 }

@@ -1,6 +1,6 @@
 fn format_f32(bits: u32) -> String {
     let sign_bit = (bits >> 31) & 1;
-    let exp_raw = ((bits >> 23) & 0xFF) as u32;
+    let exp_raw = (bits >> 23) & 0xFF;
     let mantissa = bits & 0x7FFFFF;
 
     let sign_str = if sign_bit == 0 { "+" } else { "-" };
@@ -8,7 +8,11 @@ fn format_f32(bits: u32) -> String {
 
     let category = if exp_raw == 0xFF {
         if mantissa == 0 {
-            if sign_bit == 0 { "+Infinity" } else { "-Infinity" }
+            if sign_bit == 0 {
+                "+Infinity"
+            } else {
+                "-Infinity"
+            }
         } else if (mantissa >> 22) & 1 == 1 {
             "qNaN"
         } else {
@@ -30,18 +34,15 @@ fn format_f32(bits: u32) -> String {
                 .rev()
                 .map(|i| char::from_digit((mantissa >> i) & 1, 10).unwrap())
                 .collect();
-            format!(
-                "{}1.{} x 2^{}",
-                sign_str, mantissa_str, exp_biased
-            )
-        }
+            format!("{}1.{} x 2^{}", sign_str, mantissa_str, exp_biased)
+        },
         "Subnormal" => {
             let mantissa_str: String = (0..23)
                 .rev()
                 .map(|i| char::from_digit((mantissa >> i) & 1, 10).unwrap())
                 .collect();
             format!("{}0.{} x 2^-126 (subnormal)", sign_str, mantissa_str)
-        }
+        },
         _ => category.to_string(),
     };
 
@@ -85,7 +86,11 @@ fn format_f64(bits: u64) -> String {
 
     let category = if exp_raw == 0x7FF {
         if mantissa == 0 {
-            if sign_bit == 0 { "+Infinity" } else { "-Infinity" }
+            if sign_bit == 0 {
+                "+Infinity"
+            } else {
+                "-Infinity"
+            }
         } else if (mantissa >> 51) & 1 == 1 {
             "qNaN"
         } else {
@@ -108,14 +113,14 @@ fn format_f64(bits: u64) -> String {
                 .map(|i| char::from_digit(((mantissa >> i) & 1) as u32, 10).unwrap())
                 .collect();
             format!("{}1.{} x 2^{}", sign_str, mantissa_str, exp_biased)
-        }
+        },
         "Subnormal" => {
             let mantissa_str: String = (0..52)
                 .rev()
                 .map(|i| char::from_digit(((mantissa >> i) & 1) as u32, 10).unwrap())
                 .collect();
             format!("{}0.{} x 2^-1022 (subnormal)", sign_str, mantissa_str)
-        }
+        },
         _ => category.to_string(),
     };
 

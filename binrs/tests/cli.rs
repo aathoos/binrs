@@ -14,10 +14,7 @@ fn binrs(args: &[&str]) -> (String, String, bool) {
 fn encode_hello_bin() {
     let (out, _, ok) = binrs(&["encode", "hello"]);
     assert!(ok);
-    assert_eq!(
-        out.trim(),
-        "01101000 01100101 01101100 01101100 01101111"
-    );
+    assert_eq!(out.trim(), "01101000 01100101 01101100 01101100 01101111");
 }
 
 #[test]

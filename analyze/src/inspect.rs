@@ -63,7 +63,7 @@ pub fn inspect_xxd(bytes: &[u8], width: usize) -> String {
             let ascii_part: String = chunk
                 .iter()
                 .map(|&b| {
-                    if b >= 0x20 && b < 0x7f {
+                    if (0x20..0x7f).contains(&b) {
                         b as char
                     } else {
                         '.'
@@ -141,7 +141,10 @@ pub fn inspect_with_style(bytes: &[u8], style: &str, width: usize) -> Result<Str
 
 pub fn inspect_summary(bytes: &[u8]) -> String {
     let total = bytes.len();
-    let printable = bytes.iter().filter(|&&b| b.is_ascii_graphic() || b == b' ').count();
+    let printable = bytes
+        .iter()
+        .filter(|&&b| b.is_ascii_graphic() || b == b' ')
+        .count();
     let null_count = bytes.iter().filter(|&&b| b == 0).count();
     let high_count = bytes.iter().filter(|&&b| b >= 0x80).count();
     format!(

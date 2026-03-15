@@ -32,10 +32,7 @@ pub fn decode_format(input: &str, fmt: Format, lsb: bool) -> Result<Vec<u8>, Str
 }
 
 pub fn decode_hex_str(s: &str) -> Result<Vec<u8>, String> {
-    let cleaned: String = s
-        .chars()
-        .filter(|c| c.is_ascii_hexdigit())
-        .collect();
+    let cleaned: String = s.chars().filter(|c| c.is_ascii_hexdigit()).collect();
     if cleaned.len() % 2 != 0 {
         return Err(format!(
             "hex string has odd length {}: cannot decode to bytes",
@@ -65,19 +62,35 @@ pub fn decode_dec_str(s: &str) -> Result<Vec<u8>, String> {
 }
 
 pub fn bytes_to_hex(bytes: &[u8]) -> String {
-    bytes.iter().map(|&b| format!("{:02x}", b)).collect::<Vec<_>>().join(" ")
+    bytes
+        .iter()
+        .map(|&b| format!("{:02x}", b))
+        .collect::<Vec<_>>()
+        .join(" ")
 }
 
 pub fn bytes_to_bin(bytes: &[u8]) -> String {
-    bytes.iter().map(|&b| format!("{:08b}", b)).collect::<Vec<_>>().join(" ")
+    bytes
+        .iter()
+        .map(|&b| format!("{:08b}", b))
+        .collect::<Vec<_>>()
+        .join(" ")
 }
 
 pub fn bytes_to_oct(bytes: &[u8]) -> String {
-    bytes.iter().map(|&b| format!("{:03o}", b)).collect::<Vec<_>>().join(" ")
+    bytes
+        .iter()
+        .map(|&b| format!("{:03o}", b))
+        .collect::<Vec<_>>()
+        .join(" ")
 }
 
 pub fn bytes_to_dec(bytes: &[u8]) -> String {
-    bytes.iter().map(|&b| format!("{}", b)).collect::<Vec<_>>().join(" ")
+    bytes
+        .iter()
+        .map(|&b| format!("{}", b))
+        .collect::<Vec<_>>()
+        .join(" ")
 }
 
 pub fn bytes_to_format(bytes: &[u8], fmt: Format) -> String {

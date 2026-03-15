@@ -24,7 +24,7 @@ pub fn shift(a: &str, n: u32, left: bool) -> Result<String, String> {
 
 pub fn rotate(a: &str, n: u32, left: bool) -> Result<String, String> {
     let av = parse(a)?;
-    let r = (n % 8) as u32;
+    let r = n % 8;
     let result: Vec<u8> = if left {
         av.iter().map(|&x| x.rotate_left(r)).collect()
     } else {

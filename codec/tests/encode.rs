@@ -1,6 +1,6 @@
 use codec::encode::{
-    decode_base64, decode_bcd, decode_gray, decode_run_length_binary, encode, encode_base64,
-    encode_bcd, encode_gray, encode_run_length_binary, EncodeOpts,
+    EncodeOpts, decode_base64, decode_bcd, decode_gray, decode_run_length_binary, encode,
+    encode_base64, encode_bcd, encode_gray, encode_run_length_binary,
 };
 use codec::format::Format;
 

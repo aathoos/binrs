@@ -1,7 +1,7 @@
-use convert::checksum::compute;
-use codec::encode::{encode, encode_base64, encode_gray, encode_run_length_binary, EncodeOpts};
+use codec::encode::{EncodeOpts, encode, encode_base64, encode_gray, encode_run_length_binary};
 use codec::format::Format;
-use criterion::{black_box, criterion_group, criterion_main, BenchmarkId, Criterion, Throughput};
+use convert::checksum::compute;
+use criterion::{BenchmarkId, Criterion, Throughput, black_box, criterion_group, criterion_main};
 
 fn bench_encode_bin(c: &mut Criterion) {
     let mut group = c.benchmark_group("encode_bin");

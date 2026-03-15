@@ -45,24 +45,18 @@ pub fn diff_binary(a: &str, b: &str, fmt: Format) -> Result<String, String> {
                         if bit_diffs == 1 { "" } else { "s" }
                     ));
                 }
-            }
+            },
             (Some(&xa), None) => {
                 diff_bytes += 1;
                 diff_bits += 8;
-                lines.push(format!(
-                    "byte {:04x}: {:08b} only in A",
-                    i, xa
-                ));
-            }
+                lines.push(format!("byte {:04x}: {:08b} only in A", i, xa));
+            },
             (None, Some(&xb)) => {
                 diff_bytes += 1;
                 diff_bits += 8;
-                lines.push(format!(
-                    "byte {:04x}: {:08b} only in B",
-                    i, xb
-                ));
-            }
-            (None, None) => {}
+                lines.push(format!("byte {:04x}: {:08b} only in B", i, xb));
+            },
+            (None, None) => {},
         }
     }
 
@@ -74,12 +68,15 @@ pub fn diff_binary(a: &str, b: &str, fmt: Format) -> Result<String, String> {
     };
 
     lines.push(String::new());
-    lines.push(format!("summary:"));
+    lines.push("summary:".to_string());
     lines.push(format!("  A length: {} bytes", av.len()));
     lines.push(format!("  B length: {} bytes", bv.len()));
     lines.push(format!("  same bytes:  {}", same_bytes));
     lines.push(format!("  diff bytes:  {}", diff_bytes));
-    lines.push(format!("  diff bits:   {} / {} total bits", diff_bits, total_bits));
+    lines.push(format!(
+        "  diff bits:   {} / {} total bits",
+        diff_bits, total_bits
+    ));
     lines.push(format!("  similarity:  {:.2}%", similarity));
 
     if diff_bytes == 0 {
@@ -106,24 +103,28 @@ pub fn diff_bytes_raw(a: &[u8], b: &[u8]) -> String {
                     diff_bits += xor.count_ones() as usize;
                     let marker: String = (0..8)
                         .map(|bit| {
-                            if (xor >> (7 - bit)) & 1 == 1 { '^' } else { ' ' }
+                            if (xor >> (7 - bit)) & 1 == 1 {
+                                '^'
+                            } else {
+                                ' '
+                            }
                         })
                         .collect();
                     lines.push(format!("byte {:04x}: {:08b} != {:08b}", i, xa, xb));
                     lines.push(format!("           {}    {}", marker, marker));
                 }
-            }
+            },
             (Some(&xa), None) => {
                 diff_bytes += 1;
                 diff_bits += 8;
                 lines.push(format!("byte {:04x}: {:08b} only in A", i, xa));
-            }
+            },
             (None, Some(&xb)) => {
                 diff_bytes += 1;
                 diff_bits += 8;
                 lines.push(format!("byte {:04x}: {:08b} only in B", i, xb));
-            }
-            (None, None) => {}
+            },
+            (None, None) => {},
         }
     }
 

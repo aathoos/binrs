@@ -59,7 +59,10 @@ pub fn bit_field_set(a: &str, start: u8, end: u8, value_bits: &str) -> Result<St
         ));
     }
     let field_len = (end - start + 1) as usize;
-    let vb: Vec<char> = value_bits.chars().filter(|c| *c == '0' || *c == '1').collect();
+    let vb: Vec<char> = value_bits
+        .chars()
+        .filter(|c| *c == '0' || *c == '1')
+        .collect();
     if vb.len() != field_len {
         return Err(format!(
             "value bits length {} does not match field length {}",

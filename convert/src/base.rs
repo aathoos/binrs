@@ -8,12 +8,11 @@ fn parse_value(value: &str, from: Format) -> Result<Vec<u8>, String> {
         .map(|tok| {
             let v: u128 = match from {
                 Format::Bin => u128::from_str_radix(tok.trim_start_matches("0b"), 2),
-                Format::Hex => u128::from_str_radix(
-                    tok.trim_start_matches("0x").trim_start_matches("0X"),
-                    16,
-                ),
+                Format::Hex => {
+                    u128::from_str_radix(tok.trim_start_matches("0x").trim_start_matches("0X"), 16)
+                },
                 Format::Oct => u128::from_str_radix(tok.trim_start_matches("0o"), 8),
-                Format::Dec => u128::from_str_radix(tok, 10),
+                Format::Dec => tok.parse::<u128>(),
             }
             .map_err(|_| format!("invalid {} token '{}'", from, tok))?;
             if v > 255 {
@@ -28,12 +27,11 @@ fn parse_single_u128(value: &str, from: Format) -> Result<u128, String> {
     let s = value.trim();
     match from {
         Format::Bin => u128::from_str_radix(s.trim_start_matches("0b"), 2),
-        Format::Hex => u128::from_str_radix(
-            s.trim_start_matches("0x").trim_start_matches("0X"),
-            16,
-        ),
+        Format::Hex => {
+            u128::from_str_radix(s.trim_start_matches("0x").trim_start_matches("0X"), 16)
+        },
         Format::Oct => u128::from_str_radix(s.trim_start_matches("0o"), 8),
-        Format::Dec => u128::from_str_radix(s, 10),
+        Format::Dec => s.parse::<u128>(),
     }
     .map_err(|_| format!("invalid {} value: '{}'", from, s))
 }
@@ -71,7 +69,10 @@ pub fn interpret_signed(value: &str, from: Format) -> Result<String, String> {
         .enumerate()
         .map(|(i, &b)| {
             let signed = b as i8;
-            format!("  [{:02}] 0x{:02x} ({:08b}) = {} (signed i8)", i, b, b, signed)
+            format!(
+                "  [{:02}] 0x{:02x} ({:08b}) = {} (signed i8)",
+                i, b, b, signed
+            )
         })
         .collect();
     Ok(lines.join("\n"))
@@ -149,14 +150,14 @@ pub fn convert_show_all_bases(value: &str, from: Format) -> Result<String, Strin
         .iter()
         .map(|&b| format!("{:08b}", b ^ (b >> 1)))
         .collect();
-    let signed_bytes: Vec<String> = bytes_repr
-        .iter()
-        .map(|&b| format!("{}", b as i8))
-        .collect();
+    let signed_bytes: Vec<String> = bytes_repr.iter().map(|&b| format!("{}", b as i8)).collect();
     Ok(format!(
         "value: {}\n  binary:      {:b}\n  hex:         {:x}\n  octal:       {:o}\n  decimal:     {}\n  gray code:   {}\n  signed(i8):  {}",
         value.trim(),
-        n, n, n, n,
+        n,
+        n,
+        n,
+        n,
         gray_bytes.join(" "),
         signed_bytes.join(" ")
     ))
@@ -167,12 +168,7 @@ pub fn format_byte_table(bytes: &[u8]) -> String {
     for (i, &b) in bytes.iter().enumerate() {
         lines.push(format!(
             "{:3}  {:08b}  {:02x}   {:03o}  {:3}  {:4}",
-            i,
-            b,
-            b,
-            b,
-            b,
-            b as i8
+            i, b, b, b, b, b as i8
         ));
     }
     lines.join("\n")

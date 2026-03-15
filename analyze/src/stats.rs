@@ -1,7 +1,7 @@
 pub fn format_bar(fraction: f64, width: usize) -> String {
     let filled = ((fraction * width as f64).round() as usize).min(width);
-    let bar: String = std::iter::repeat('\u{2588}').take(filled).collect();
-    let empty: String = std::iter::repeat(' ').take(width - filled).collect();
+    let bar = "\u{2588}".repeat(filled);
+    let empty = " ".repeat(width - filled);
     format!("[{}{}]", bar, empty)
 }
 
@@ -19,14 +19,14 @@ fn bit_position_histogram(bytes: &[u8]) -> String {
     }
     let total = bytes.len() as f64;
     let mut lines = Vec::new();
-    for i in 0..8 {
-        let frac = counts[i] as f64 / total;
+    for (i, &count) in counts.iter().enumerate() {
+        let frac = count as f64 / total;
         let bar = format_bar(frac, 30);
         lines.push(format!(
             "  b{} (bit {}): {:5} ({:6.2}%) {}",
             7 - i,
             i,
-            counts[i],
+            count,
             frac * 100.0,
             bar
         ));

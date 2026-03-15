@@ -1,5 +1,5 @@
 use clap::{Parser, Subcommand};
-use codec::encode::{encode, EncodeOpts};
+use codec::encode::{EncodeOpts, encode};
 use codec::format::Format;
 use std::path::PathBuf;
 use std::str::FromStr;
@@ -421,7 +421,7 @@ fn read_bytes(file: Option<PathBuf>, args: Vec<String>) -> Result<Vec<u8>, Strin
     match file {
         Some(path) => {
             std::fs::read(&path).map_err(|e| format!("failed to read '{}': {}", path.display(), e))
-        }
+        },
         None => Ok(args.join(" ").into_bytes()),
     }
 }
@@ -446,7 +446,7 @@ fn write_text(output: Option<PathBuf>, content: &str) -> Result<(), String> {
         None => {
             println!("{}", content);
             Ok(())
-        }
+        },
     }
 }
 
@@ -459,7 +459,7 @@ fn write_bytes(output: Option<PathBuf>, content: &[u8]) -> Result<(), String> {
             std::io::stdout()
                 .write_all(content)
                 .map_err(|e| format!("failed to write to stdout: {}", e))
-        }
+        },
     }
 }
 
@@ -470,10 +470,7 @@ fn parse_fmt(s: &str) -> Result<Format, String> {
 fn parse_range(s: &str) -> Result<(u8, u8), String> {
     let parts: Vec<&str> = s.split(':').collect();
     if parts.len() != 2 {
-        return Err(format!(
-            "invalid range '{}': expected format START:END",
-            s
-        ));
+        return Err(format!("invalid range '{}': expected format START:END", s));
     }
     let start: u8 = parts[0]
         .parse()
@@ -513,7 +510,7 @@ fn run() -> Result<(), String> {
                 encode(text.as_bytes(), &opts)
             };
             write_text(output, &result)
-        }
+        },
 
         Command::Decode {
             file,
@@ -526,7 +523,7 @@ fn run() -> Result<(), String> {
             let text = read_text(file, input)?;
             let bytes = codec::decode::decode_format(&text, fmt, lsb)?;
             write_bytes(output, &bytes)
-        }
+        },
 
         Command::Inspect {
             file,
@@ -544,7 +541,7 @@ fn run() -> Result<(), String> {
                 result.push_str(&analyze::inspect::inspect_summary(&bytes));
             }
             write_text(output, &result)
-        }
+        },
 
         Command::Xor {
             file_a,
@@ -557,7 +554,7 @@ fn run() -> Result<(), String> {
             let sb = read_op_side(file_b, b, "b")?;
             let result = ops::xor(&sa, &sb)?;
             write_text(output, &result)
-        }
+        },
 
         Command::And {
             file_a,
@@ -570,7 +567,7 @@ fn run() -> Result<(), String> {
             let sb = read_op_side(file_b, b, "b")?;
             let result = ops::and(&sa, &sb)?;
             write_text(output, &result)
-        }
+        },
 
         Command::Or {
             file_a,
@@ -583,7 +580,7 @@ fn run() -> Result<(), String> {
             let sb = read_op_side(file_b, b, "b")?;
             let result = ops::or(&sa, &sb)?;
             write_text(output, &result)
-        }
+        },
 
         Command::Not {
             file,
@@ -593,7 +590,7 @@ fn run() -> Result<(), String> {
             let text = read_text(file, input)?;
             let result = ops::not(&text)?;
             write_text(output, &result)
-        }
+        },
 
         Command::Shift {
             left,
@@ -610,7 +607,7 @@ fn run() -> Result<(), String> {
             let text = read_text(file, input)?;
             let result = ops::shift(&text, n, go_left)?;
             write_text(output, &result)
-        }
+        },
 
         Command::Reverse {
             file,
@@ -620,14 +617,14 @@ fn run() -> Result<(), String> {
             let text = read_text(file, input)?;
             let result = ops::reverse(&text)?;
             write_text(output, &result)
-        }
+        },
 
         Command::Stats { file, top, input } => {
             let bytes = read_bytes(file, input)?;
             let result = analyze::stats::compute_and_format(&bytes, top);
             println!("{}", result);
             Ok(())
-        }
+        },
 
         Command::Convert { from, to, value } => {
             let from_fmt = parse_fmt(&from)?;
@@ -635,7 +632,7 @@ fn run() -> Result<(), String> {
             let result = convert::base::convert(&value, from_fmt, to_fmt)?;
             println!("{}", result);
             Ok(())
-        }
+        },
 
         Command::Nand {
             file_a,
@@ -648,7 +645,7 @@ fn run() -> Result<(), String> {
             let sb = read_op_side(file_b, b, "b")?;
             let result = ops::nand(&sa, &sb)?;
             write_text(output, &result)
-        }
+        },
 
         Command::Nor {
             file_a,
@@ -661,7 +658,7 @@ fn run() -> Result<(), String> {
             let sb = read_op_side(file_b, b, "b")?;
             let result = ops::nor(&sa, &sb)?;
             write_text(output, &result)
-        }
+        },
 
         Command::Xnor {
             file_a,
@@ -674,7 +671,7 @@ fn run() -> Result<(), String> {
             let sb = read_op_side(file_b, b, "b")?;
             let result = ops::xnor(&sa, &sb)?;
             write_text(output, &result)
-        }
+        },
 
         Command::Rotate {
             left,
@@ -691,7 +688,7 @@ fn run() -> Result<(), String> {
             let text = read_text(file, input)?;
             let result = ops::rotate(&text, n, go_left)?;
             write_text(output, &result)
-        }
+        },
 
         Command::Swap {
             bytes,
@@ -710,35 +707,35 @@ fn run() -> Result<(), String> {
                 ops::swap_nibbles(&text)?
             };
             write_text(output, &result)
-        }
+        },
 
         Command::Popcount { file, input } => {
             let text = read_text(file, input)?;
             let result = ops::format_popcount_output(&text)?;
             println!("{}", result);
             Ok(())
-        }
+        },
 
         Command::Clz { file, input } => {
             let text = read_text(file, input)?;
             let result = ops::format_clz_output(&text)?;
             println!("{}", result);
             Ok(())
-        }
+        },
 
         Command::Ctz { file, input } => {
             let text = read_text(file, input)?;
             let result = ops::format_ctz_output(&text)?;
             println!("{}", result);
             Ok(())
-        }
+        },
 
         Command::Parity { file, input } => {
             let text = read_text(file, input)?;
             let result = ops::parity(&text)?;
             println!("{}", result);
             Ok(())
-        }
+        },
 
         Command::Field {
             get,
@@ -755,14 +752,13 @@ fn run() -> Result<(), String> {
                 write_text(output, &result)
             } else if let Some(range_str) = set_range {
                 let (start, end) = parse_range(&range_str)?;
-                let vbits = value
-                    .ok_or_else(|| "field set requires --value BITS".to_string())?;
+                let vbits = value.ok_or_else(|| "field set requires --value BITS".to_string())?;
                 let result = ops::bit_field_set(&text, start, end, &vbits)?;
                 write_text(output, &result)
             } else {
                 Err("provide either --get START:END or --set START:END".to_string())
             }
-        }
+        },
 
         Command::Interleave {
             file_a,
@@ -775,7 +771,7 @@ fn run() -> Result<(), String> {
             let sb = read_op_side(file_b, b, "b")?;
             let result = ops::interleave(&sa, &sb)?;
             write_text(output, &result)
-        }
+        },
 
         Command::Deinterleave {
             file,
@@ -785,7 +781,7 @@ fn run() -> Result<(), String> {
             let text = read_text(file, input)?;
             let result = ops::deinterleave(&text)?;
             write_text(output, &result)
-        }
+        },
 
         Command::Gray {
             decode,
@@ -810,7 +806,7 @@ fn run() -> Result<(), String> {
                 let result = codec::encode::encode_gray(&bytes, " ", None);
                 write_text(output, &result)
             }
-        }
+        },
 
         Command::Bcd {
             decode,
@@ -835,7 +831,7 @@ fn run() -> Result<(), String> {
                 let result = codec::encode::encode_bcd(&bytes, " ", None);
                 write_text(output, &result)
             }
-        }
+        },
 
         Command::Base64 {
             decode,
@@ -852,7 +848,7 @@ fn run() -> Result<(), String> {
                 let result = codec::encode::encode_base64(&bytes);
                 write_text(output, &result)
             }
-        }
+        },
 
         Command::Rle {
             decode,
@@ -869,14 +865,14 @@ fn run() -> Result<(), String> {
                 let result = codec::encode::encode_run_length_binary(&bytes);
                 write_text(output, &result)
             }
-        }
+        },
 
         Command::Crc { algo, file, input } => {
             let bytes = read_bytes(file, input)?;
             let result = convert::checksum::compute(&bytes, &algo)?;
             println!("{}", result);
             Ok(())
-        }
+        },
 
         Command::Diff {
             file_a,
@@ -891,7 +887,7 @@ fn run() -> Result<(), String> {
             let result = analyze::diff::diff_binary(&sa, &sb, fmt)?;
             println!("{}", result);
             Ok(())
-        }
+        },
 
         Command::Pattern {
             r#type,
@@ -912,7 +908,7 @@ fn run() -> Result<(), String> {
                 _ => generate::patterns::display(&bytes, " ", Some(8)),
             };
             write_text(output, &result)
-        }
+        },
 
         Command::Float {
             is_f64,
@@ -922,14 +918,14 @@ fn run() -> Result<(), String> {
             let result = analyze::float::inspect_float(&value, is_f64, bits)?;
             println!("{}", result);
             Ok(())
-        }
+        },
 
         Command::All { from, value } => {
             let from_fmt = parse_fmt(&from)?;
             let result = convert::base::convert_all(&value, from_fmt)?;
             println!("{}", result);
             Ok(())
-        }
+        },
 
         Command::Specials { is_f64 } => {
             if is_f64 {
@@ -938,7 +934,7 @@ fn run() -> Result<(), String> {
                 println!("{}", analyze::float::float_special_values_f32());
             }
             Ok(())
-        }
+        },
 
         Command::Signed { from, file, input } => {
             let fmt = parse_fmt(&from)?;
@@ -946,7 +942,7 @@ fn run() -> Result<(), String> {
             let result = convert::base::interpret_signed(&text, fmt)?;
             println!("{}", result);
             Ok(())
-        }
+        },
 
         Command::Twos { from, file, input } => {
             let fmt = parse_fmt(&from)?;
@@ -954,14 +950,14 @@ fn run() -> Result<(), String> {
             let result = convert::base::to_twos_complement(&text, fmt)?;
             println!("{}", result);
             Ok(())
-        }
+        },
 
         Command::ShowAll { from, value } => {
             let from_fmt = parse_fmt(&from)?;
             let result = convert::base::convert_show_all_bases(&value, from_fmt)?;
             println!("{}", result);
             Ok(())
-        }
+        },
 
         Command::Table { from, file, input } => {
             let fmt = parse_fmt(&from)?;
@@ -969,9 +965,14 @@ fn run() -> Result<(), String> {
             let bytes = codec::decode::decode_format(&text, fmt, false)?;
             println!("{}", convert::base::format_byte_table(&bytes));
             Ok(())
-        }
+        },
 
-        Command::GrayConv { decode, from, file, input } => {
+        Command::GrayConv {
+            decode,
+            from,
+            file,
+            input,
+        } => {
             let fmt = parse_fmt(&from)?;
             let text = read_text(file, input)?;
             let result = if decode {
@@ -981,7 +982,7 @@ fn run() -> Result<(), String> {
             };
             println!("{}", result);
             Ok(())
-        }
+        },
 
         Command::RawDiff { file_a, file_b } => {
             let a = std::fs::read(&file_a)
@@ -990,7 +991,7 @@ fn run() -> Result<(), String> {
                 .map_err(|e| format!("failed to read '{}': {}", file_b.display(), e))?;
             println!("{}", analyze::diff::diff_bytes_raw(&a, &b));
             Ok(())
-        }
+        },
 
         Command::Text { from, file, input } => {
             let text = read_text(file, input)?;
@@ -1003,9 +1004,14 @@ fn run() -> Result<(), String> {
             };
             println!("{}", codec::decode::decode_text(&bytes));
             Ok(())
-        }
+        },
 
-        Command::Format { to, from, file, input } => {
+        Command::Format {
+            to,
+            from,
+            file,
+            input,
+        } => {
             let to_fmt = parse_fmt(&to)?;
             let bytes = if from == "raw" {
                 read_bytes(file, input)?
@@ -1016,7 +1022,7 @@ fn run() -> Result<(), String> {
             };
             println!("{}", codec::decode::bytes_to_format(&bytes, to_fmt));
             Ok(())
-        }
+        },
     }
 }
 

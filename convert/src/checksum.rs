@@ -1,6 +1,6 @@
 fn crc8_table(poly: u8) -> [u8; 256] {
     let mut table = [0u8; 256];
-    for i in 0usize..256 {
+    for (i, entry) in table.iter_mut().enumerate() {
         let mut crc = i as u8;
         for _ in 0..8 {
             if crc & 0x80 != 0 {
@@ -9,14 +9,14 @@ fn crc8_table(poly: u8) -> [u8; 256] {
                 crc <<= 1;
             }
         }
-        table[i] = crc;
+        *entry = crc;
     }
     table
 }
 
 fn crc8_reflected_table(poly: u8) -> [u8; 256] {
     let mut table = [0u8; 256];
-    for i in 0usize..256 {
+    for (i, entry) in table.iter_mut().enumerate() {
         let mut crc = i as u8;
         for _ in 0..8 {
             if crc & 0x01 != 0 {
@@ -25,7 +25,7 @@ fn crc8_reflected_table(poly: u8) -> [u8; 256] {
                 crc >>= 1;
             }
         }
-        table[i] = crc;
+        *entry = crc;
     }
     table
 }
@@ -135,67 +135,40 @@ pub fn compute(data: &[u8], algo: &str) -> Result<String, String> {
     match algo.to_ascii_lowercase().as_str() {
         "crc8" | "crc8-smbus" => {
             let v = crc8(data);
-            Ok(format!(
-                "CRC-8/SMBUS: 0x{:02x} ({}) [{:08b}]",
-                v, v, v
-            ))
-        }
+            Ok(format!("CRC-8/SMBUS: 0x{:02x} ({}) [{:08b}]", v, v, v))
+        },
         "crc8-maxim" | "crc8maxim" => {
             let v = crc8_maxim(data);
-            Ok(format!(
-                "CRC-8/MAXIM: 0x{:02x} ({}) [{:08b}]",
-                v, v, v
-            ))
-        }
+            Ok(format!("CRC-8/MAXIM: 0x{:02x} ({}) [{:08b}]", v, v, v))
+        },
         "crc16" | "crc16-ccitt" | "crc16ccitt" => {
             let v = crc16_ccitt(data);
-            Ok(format!(
-                "CRC-16/CCITT: 0x{:04x} ({}) [{:016b}]",
-                v, v, v
-            ))
-        }
+            Ok(format!("CRC-16/CCITT: 0x{:04x} ({}) [{:016b}]", v, v, v))
+        },
         "crc16-arc" | "crc16arc" => {
             let v = crc16_arc(data);
-            Ok(format!(
-                "CRC-16/ARC: 0x{:04x} ({}) [{:016b}]",
-                v, v, v
-            ))
-        }
+            Ok(format!("CRC-16/ARC: 0x{:04x} ({}) [{:016b}]", v, v, v))
+        },
         "crc32" | "crc32-pkzip" => {
             let v = crc32(data);
-            Ok(format!(
-                "CRC-32/PKZIP: 0x{:08x} ({}) [{:032b}]",
-                v, v, v
-            ))
-        }
+            Ok(format!("CRC-32/PKZIP: 0x{:08x} ({}) [{:032b}]", v, v, v))
+        },
         "adler32" => {
             let v = adler32(data);
-            Ok(format!(
-                "Adler-32: 0x{:08x} ({}) [{:032b}]",
-                v, v, v
-            ))
-        }
+            Ok(format!("Adler-32: 0x{:08x} ({}) [{:032b}]", v, v, v))
+        },
         "fletcher16" => {
             let v = fletcher16(data);
-            Ok(format!(
-                "Fletcher-16: 0x{:04x} ({}) [{:016b}]",
-                v, v, v
-            ))
-        }
+            Ok(format!("Fletcher-16: 0x{:04x} ({}) [{:016b}]", v, v, v))
+        },
         "xor" | "xor-checksum" => {
             let v = xor_checksum(data);
-            Ok(format!(
-                "XOR checksum: 0x{:02x} ({}) [{:08b}]",
-                v, v, v
-            ))
-        }
+            Ok(format!("XOR checksum: 0x{:02x} ({}) [{:08b}]", v, v, v))
+        },
         "sum" | "sum-checksum" => {
             let v = sum_checksum(data);
-            Ok(format!(
-                "SUM checksum: 0x{:02x} ({}) [{:08b}]",
-                v, v, v
-            ))
-        }
+            Ok(format!("SUM checksum: 0x{:02x} ({}) [{:08b}]", v, v, v))
+        },
         "all" => {
             let lines = vec![
                 format!("CRC-8/SMBUS:   0x{:02x}", crc8(data)),
@@ -209,7 +182,7 @@ pub fn compute(data: &[u8], algo: &str) -> Result<String, String> {
                 format!("SUM checksum:  0x{:02x}", sum_checksum(data)),
             ];
             Ok(lines.join("\n"))
-        }
+        },
         _ => Err(format!(
             "unknown checksum algorithm '{}': use crc8, crc8-maxim, crc16, crc16-arc, crc32, adler32, fletcher16, xor, sum, all",
             algo
